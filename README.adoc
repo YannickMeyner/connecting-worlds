@@ -1,0 +1,83 @@
+= Connecting Worlds
+
+This application connects different chatbots to each other.
+At the moment, the chatbots are defined as static properties and triggered round robin-alike.
+
+== Quarkus resources
+
+This project uses Quarkus, the Supersonic Subatomic Java Framework.
+
+If you want to learn more about Quarkus, please visit its website: https://quarkus.io/ .
+
+The underlaying tutorial is:
+
+* https://quarkus.io/guides/getting-started
+* https://quarkus.io/guides/building-native-image
+* https://quarkus.io/guides/deploying-to-kubernetes
+
+=== Building
+
+----
+#Building normal jar
+./mvnw clean package -Dquarkus.package.type=legacy-jar
+#Build native app
+./mvnw clean package -Pnative
+#Build native app for bringing it in a container
+./mvnw clean package -Pnative -Dquarkus.native.container-build=true
+----
+
+=== Configuration of this project
+
+The app including accessible chatbots are registered in the `application.yml`.
+
+==== In Kubernetes
+
+This file must be present at start e.g. as configmap
+
+[source,yaml]
+----
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/name: connecting-worlds
+    app.kubernetes.io/version: main
+  name: connecting-worlds
+data:
+  application.yaml: |-
+    app:
+      chatbots:
+        - name: eliza
+          response_format: application/text
+          url:  http://eliza.chatbots.svc.cluster.local/message/
+        - name: roberta
+          response_format: application/text
+          url:  http://roberta.chatbots.svc.cluster.local/send?message=
+----
+
+The referenced configmap can then be mounted:
+
+[source,yaml]
+----
+apiVersion: apps/v1
+kind: Deployment
+[...]
+spec:
+  [...]
+  template:
+    [...]
+    spec:
+      containers:
+        - image: IMAGENAME
+          volumeMounts:
+          - name: quarkus-config-volume
+            mountPath: /work/config
+      [...]
+      volumes:
+        - name: quarkus-config-volume
+          configMap:
+            name: connecting-worlds
+----
+
+

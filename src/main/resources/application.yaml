@@ -1,0 +1,14 @@
+quarkus:
+  http:
+    port: 8080
+  log:
+    level: INFO
+  application:
+    name: connecting-worlds
+
+app:
+  chatbots:
+    - name: eliza
+      url: http://localhost:9090/message/
+    - name: roberta
+      url: http://localhost:7070/send?message=
