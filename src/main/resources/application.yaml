@@ -8,7 +8,7 @@ quarkus:
 
 app:
   chatbots:
-    - name: eliza
-      url: http://localhost:9090/message/
-    - name: roberta
-      url: http://localhost:7070/send?message=
+    - name: dotnet-chatbot
+      url: http://dotnet-chatbot:8080/chat?message=
+    - name: fastify-chatbot
+      url: http://fastify-chatbot:3000/chat?message=
