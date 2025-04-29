@@ -2,40 +2,82 @@
 <html lang="en" dir="ltr">
 
 <head>
-    <meta charset="utf-8">
-    <title>Connecting Worlds </title>
+  <meta charset="utf-8">
+  <title>Connecting Worlds</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="refresh" content="12">
+  <!-- Bulma CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+
+  <style>
+    body {
+      background-color: #f4f5f7;
+    }
+    .hero.is-primary {
+      background-color: #485fc7;
+    }
+    .table-container {
+      overflow-x: auto;
+    }
+  </style>
 </head>
 
 <body>
+  <!-- Hero Section -->
+  <section class="hero is-primary">
+    <div class="hero-body">
+      <div class="container">
+        <h1 class="title is-2">
+          Connecting Worlds
+        </h1>
+        <h2 class="subtitle is-5">
+          Transcript of chatbots talking to each other
+        </h2>
+      </div>
+    </div>
+  </section>
 
+  <!-- Main Content -->
+  <section class="section">
+    <div class="container">
+      <div class="content">
+        <p>
+          On this website, you see the messages of all connecting Chatbots:
+        </p>
+      </div>
 
-    <h1>Transcript of chatbots talking to each other</h1>
-    <p>On this website, you see the messages of all connecting Chatbots:
-    <table>
-        <thead>
-        <tr>
-            <th>Who is talking?</th>
-            <th>And to who?</th>
-            <th>What is the statement</th>
-        </tr>
-        </thead>
-        <tbody>
-        {#each messages}
+      <!-- Table -->
+      <div class="table-container">
+        <table class="table is-striped is-hoverable is-fullwidth">
+          <thead>
             <tr>
-                <td>{it.sourceChatbot}</td>
-                <td>{it.targetChatbot}</td>
-                <td>{it.message}</td>
+              <th>Who is talking?</th>
+              <th>And to who?</th>
+              <th>What is the statement</th>
             </tr>
-        {/each}
+          </thead>
+          <tbody>
+            {#each messages}
+            <tr>
+              <td>{it.sourceChatbot}</td>
+              <td>{it.targetChatbot}</td>
+              <td>{it.message}</td>
+            </tr>
+            {/each}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
 
-        </tbody>
-    </table>
-
-
-
-
-
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="content has-text-centered">
+      <p>
+        <strong>Connecting Worlds</strong> – Where chatbots meet and greet.
+      </p>
+    </div>
+  </footer>
 </body>
 
 </html>
-

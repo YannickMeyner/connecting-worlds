@@ -17,7 +17,7 @@ RUN mvn package -DskipTests
 RUN ls -la /app/target/
 
 # Runtime stage
-FROM eclipse-temurin:21-jre-alpine
+FROM amazoncorretto:21-alpine-jdk
 WORKDIR /work
 
 # Install required packages
