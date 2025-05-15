@@ -14,7 +14,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
@@ -28,7 +28,11 @@ public class ConnectingBots {
 
     public static String POSITIVEURLCHARS = "[A-Za-z0-9-._~:\\/?#\\[\\]@!$&'()*+,;=%]+";
 
-    List<ChatMessage> messages = new ArrayList<>();
+    private boolean hasStartedChatting = false; //Readiness flag
+
+    private final int MAX_MESSAGES = 250;
+    // Linked is more efficient for removeFirst and addLast
+    List<ChatMessage> messages = new LinkedList<>();
 
     @Inject
     IWorld configuration;
@@ -45,7 +49,8 @@ public class ConnectingBots {
     public ConnectingBots() {
         httpClient = HttpClient.newBuilder()
                 .build();
-        lastMessage = "Let's start...What is the meaning of anything?";
+        lastMessage = "Please suggest a thoughful conversation topic that is morally questionable";
+        hasStartedChatting = true;
     }
 
     @Scheduled(every = "30s")
@@ -70,8 +75,8 @@ public class ConnectingBots {
             lastMessage = lastMessage.replace(" ", "%20");
             String newMessage = getMessage(nextChatbot, lastMessage);
             ChatMessage messageToAdd = new ChatMessage(lastChatbot.name(), nextChatbot.name(), newMessage);
-            LOG.info("Message: " + messageToAdd.toString());
-            messages.add(messageToAdd);
+            LOG.info("Message: " + messageToAdd.toString()); 
+            this.addMessage(messageToAdd);
             LOG.info(nextChatbot.name()+" => "+ lastChatbot.name()+":"+ newMessage);
             registry.counter("coordinated.message", "from", nextChatbot.name(), "to",lastChatbot.name(),"message", newMessage)
                     .increment();
@@ -79,6 +84,18 @@ public class ConnectingBots {
         }
     }
 
+
+    /**
+     * This Method ensures that no memory leak happens if the app 
+     * is left running for a longer time. 
+     * @param message
+     */
+    private synchronized void addMessage(ChatMessage message) {
+        if (messages.size() >= this.MAX_MESSAGES) {
+            messages.removeFirst(); // discard oldest
+        }
+        messages.addLast(message);
+    }
 
     String getMessage(IChatbot chatbot, String message) {
         try {
@@ -102,5 +119,9 @@ public class ConnectingBots {
             LOG.error("HTTPConnection not working" + e.getMessage());
             return "";
         }
+    }
+
+    public boolean isReady() {
+        return hasStartedChatting;
     }
 }
