@@ -26,8 +26,8 @@ public class ConnectingBots {
 
     private static final Logger LOG = Logger.getLogger(ConnectingBots.class);
 
-    public static String POSITIVEURLCHARS = "[A-Za-z0-9-._~:\\/?#\\[\\]@!$&'()*+,;=%]+";
-
+    public static String POSITIVEURLCHARS = "[A-Za-z0-9-._~:\\/?\\[\\]@!$&'()*+,;=%]+";
+ 
     private boolean hasStartedChatting = false; //Readiness flag
 
     private final int MAX_MESSAGES = 250;
