@@ -1,6 +1,7 @@
 package ch.fhnw.devops.connectingworlds;
 
 
+import io.micrometer.core.instrument.MeterRegistry;
 import io.quarkus.qute.Template;
 import io.quarkus.qute.TemplateInstance;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -26,9 +27,19 @@ public class ConversationResource {
     @Inject
     ConnectingBots connectingBots;
 
+    @Inject
+    MeterRegistry registry;
+
     @GET
     @Produces(MediaType.TEXT_HTML)
     public TemplateInstance getConversation() {
+        // SLI: Totale Anzahl Requests
+        // SLO: 99.9% Verfügbarkeit in einem bestimmten Betrachtungszeitraum
+        registry.counter("http_requests_total", 
+                        "method", "GET", 
+                        "route", "/", 
+                        "status_code", "200").increment();
+        
         LOG.info("Size of messages:"+ connectingBots.messages.size());
         return index.data("messages", connectingBots.messages);
     }

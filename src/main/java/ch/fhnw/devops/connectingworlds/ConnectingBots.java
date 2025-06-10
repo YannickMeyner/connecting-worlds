@@ -74,13 +74,22 @@ public class ConnectingBots {
         } else {
             lastMessage = lastMessage.replace(" ", "%20");
             String newMessage = getMessage(nextChatbot, lastMessage);
-            ChatMessage messageToAdd = new ChatMessage(lastChatbot.name(), nextChatbot.name(), newMessage);
-            LOG.info("Message: " + messageToAdd.toString()); 
-            this.addMessage(messageToAdd);
-            LOG.info(nextChatbot.name()+" => "+ lastChatbot.name()+":"+ newMessage);
-            registry.counter("coordinated.message", "from", nextChatbot.name(), "to",lastChatbot.name(),"message", newMessage)
-                    .increment();
-            lastMessage=newMessage;
+            
+            // SLI: Anzahl erfolgreiche Requests (nur wenn die Response nicht empty ist)
+            // SLO: 95% der Requests müssen erfolgreich sein (HTTP 200) z.B. innerhalb von 24h
+            if (newMessage != null && !newMessage.trim().isEmpty()) {
+                registry.counter("chat_successful_messages_total").increment();
+                
+                ChatMessage messageToAdd = new ChatMessage(lastChatbot.name(), nextChatbot.name(), newMessage);
+                LOG.info("Message: " + messageToAdd.toString()); 
+                this.addMessage(messageToAdd);
+                LOG.info(nextChatbot.name()+" => "+ lastChatbot.name()+":"+ newMessage);
+                registry.counter("coordinated.message", "from", nextChatbot.name(), "to",lastChatbot.name(),"message", newMessage)
+                        .increment();
+                lastMessage=newMessage;
+            } else {
+                LOG.warn("Received empty or null message from chatbot: " + nextChatbot.name());
+            }
         }
     }
 
